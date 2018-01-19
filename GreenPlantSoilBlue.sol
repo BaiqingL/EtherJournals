@@ -1,7 +1,7 @@
 pragma solidity ^0.4.4;
 
 contract Token {
-    ///CONTRACT ON ROPSTEN TESTNET 0x085eBEc2BFAF88193875FD79bbba3b23e882A9a5
+    ///CONTRACT ON ROPSTEN TESTNET 0x085ebec2bfaf88193875fd79bbba3b23e882a9a5
     /// @return total amount of tokens
     function totalSupply() constant returns (uint256 supply) {}
 
