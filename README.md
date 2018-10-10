@@ -1,3 +1,3 @@
 # Ethereum Testing
 
-CMU 15-112 Term Project
+Ether Journals project and other tests
