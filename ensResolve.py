@@ -19,7 +19,7 @@ def nameToAddress():
     domain = getName()
     while not domain.endswith('.eth'):
         print("Please enter domain with '.eth'")
-        domain = getDomain()
+        domain = getName()
     print(ns.address(domain))
 
 
