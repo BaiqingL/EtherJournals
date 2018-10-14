@@ -41,6 +41,8 @@ def selectChoice():
     elif choice == '2':
         addressToName()
         return
+    elif choice == 'exit' or 'N' or '3':
+        return
     else:
         print("Choice invalid")
         selectChoice()
