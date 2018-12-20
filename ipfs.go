@@ -14,11 +14,6 @@ import (
 	"os"
 )
 
-func main() {
-	file := readFile(getInput())
-	fmt.Printf("%d", file)
-}
-
 func getInput() string{
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Printf("File name to encode: ")
@@ -42,4 +37,9 @@ func writeToIPFS(alphaContent []byte){
         os.Exit(1)
 	}
     fmt.Printf("IPFS hash: %s\n", id)
+}
+
+func main() {
+	file := readFile(getInput())
+	writeToIPFS(file)
 }
