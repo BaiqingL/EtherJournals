@@ -1,32 +1,38 @@
 package main
 
-/* TODO
-Read files into bytes
-Compress said bytes
-Upload to IPFS with option to pin
+/* TODO:
+Allow user to specify files
+Pin files
 Profit?
 */
 
-
 import (
-    "strings"
-    "os"
-    "fmt"
-    shell "github.com/ipfs/go-ipfs-api"
+	"bytes"
+	"fmt"
+	"github.com/ipfs/go-ipfs-api"
+	"io/ioutil"
+	"os"
 )
 
 func main() {
-        writeToIPFS("ipfs api in golang")
+	file := readFile("example.pdf")
+	writeToIPFS(file)
 }
 
+func readFile(filename string) []byte{
+	bytes, err:= ioutil.ReadFile(filename)
+	if err != nil {
+		fmt.Print(err)
+	}
+	return bytes
+}
 
-func writeToIPFS(alphaContent string){
-        // Where your local node is running on localhost:5001
-        sh := shell.NewShell("localhost:5001")
-        cid, err := sh.Add(strings.NewReader(alphaContent))
-        if err != nil {
+func writeToIPFS(alphaContent []byte){
+	sh := shell.NewShell("localhost:5001")
+	id, err := sh.Add(bytes.NewReader(alphaContent))
+	if err != nil {
         fmt.Fprintf(os.Stderr, "error: %s", err)
         os.Exit(1)
-        }
-    fmt.Printf("added %s\n", cid)
+	}
+    fmt.Printf("IPFS hash: %s\n", id)
 }
