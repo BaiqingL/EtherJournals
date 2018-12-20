@@ -1,12 +1,12 @@
 package main
 
 /* TODO:
-Allow user to specify files
 Pin files
 Profit?
 */
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"github.com/ipfs/go-ipfs-api"
@@ -15,16 +15,23 @@ import (
 )
 
 func main() {
-	file := readFile("example.pdf")
-	writeToIPFS(file)
+	file := readFile(getInput())
+	fmt.Printf("%d", file)
+}
+
+func getInput() string{
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Printf("File name to encode: ")
+	text, _ := reader.ReadString('\n')
+	return text[:len(text)-1]
 }
 
 func readFile(filename string) []byte{
-	bytes, err:= ioutil.ReadFile(filename)
+	rawBytes, err:= ioutil.ReadFile(filename)
 	if err != nil {
 		fmt.Print(err)
 	}
-	return bytes
+	return rawBytes
 }
 
 func writeToIPFS(alphaContent []byte){
