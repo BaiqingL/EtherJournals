@@ -1,31 +1,37 @@
 package main
 
 import (
-  "fmt"
-  "runtime"
+    "fmt"
+    "sync"
+    "time"
 )
 
+func dosomething(millisecs time.Duration, wg *sync.WaitGroup) {
+    duration := millisecs * time.Millisecond
+    time.Sleep(duration) // Sleeps the duration specified in ms
+    fmt.Println("Function in background, duration:", duration)
+    wg.Done()
+}
+
 func main() {
-	for i:=0; i<10; i++{
-		raceIt()
-	}
-}
+    var wg sync.WaitGroup // Create the workgroup to wait
 
-func googleIt(respond chan<- string, query string) {
-  // Do stuff that causes latency
-  fmt.Printf("Sent query: %s\n", query)
-  respond <- query
-}
+    // You would want to add a workgroup every time before actually needing it
+    wg.Add(1)
+    go dosomething(200, &wg)
 
-func raceIt(){
-  query1 := "Query1"
-  query2 := "Query2"
-  respond := make(chan string)
+    wg.Add(1)
+    go dosomething(400, &wg)
 
-  go googleIt(respond, query1)
-  go googleIt(respond, query2)
-  queryResp := <-respond
+    wg.Add(1)
+    go dosomething(1500, &wg)
 
-  fmt.Printf("Number of CPUs: %d\n", runtime.NumCPU())
-  fmt.Printf("Got Response: %s\n", queryResp)
+    wg.Add(1)
+    go dosomething(150, &wg)
+
+    wg.Add(1)
+    go dosomething(600, &wg)
+
+    wg.Wait()
+    fmt.Println("Done")
 }
