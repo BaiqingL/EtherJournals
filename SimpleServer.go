@@ -1,5 +1,7 @@
 package main
 
+// https://gist.github.com/hongster/04660a20f2498fb7b680 Ok this works I guess
+
 import(
   "net"
   "fmt"
