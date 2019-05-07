@@ -1,7 +1,5 @@
 package main
 
-// TODO: Example code only, seriously need to optimize
-
 import(
   "net"
   "fmt"
@@ -60,13 +58,12 @@ func main() {
             fmt.Printf("Connection closed by host\n")
             conn.Write([]byte("goodbye.\n"))
             conn.Close()
+          }
 
           // If there is an error, terminate connection
           if err != nil{
             fmt.Printf("\nConnection terminated.\n")
             conn.Close()
-          }
-
           }
         }()
 
