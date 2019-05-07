@@ -1,73 +1,77 @@
 package main
 
-// https://gist.github.com/hongster/04660a20f2498fb7b680 Ok this works I guess
-
-import(
-  "net"
+import (
   "fmt"
-  "bufio"
+  "net"
   "time"
+  "bufio"
 )
 
-
-func check(err error, message string) {
-
-    if err != nil {
-        panic(err)
-    }
-    fmt.Printf("%s\n", message)
-
-}
-
-func handleConnection(conn net.Conn){
+func handleConnection(conn net.Conn) {
+  fmt.Println("Handling new connection")
 
   // Close connection when this function ends
   defer func() {
-    fmt.Println("Closing connection.")
+    fmt.Println("Closing connection")
     conn.Close()
   }()
 
-  timeoutDuration := 5 * time.Second
-  buf := bufio.NewReader(conn)
-    for{
-      conn.SetReadDeadline(time.Now().Add(timeoutDuration))
-      msg, err := buf.ReadString('\n')
-      fmt.Printf("Data recieved: %v", msg)
+  // Enforce a timeout after 20 seconds of no response
+  timeoutDuration := 20 * time.Second
+  bufReader := bufio.NewReader(conn)
 
-      if string(msg) == "close\n"{
-        fmt.Printf("Connection closed by host\n")
-        conn.Write([]byte("goodbye.\n"))
-        conn.Close()
-      }
+  // Print out where the connection is coming from
+  fmt.Printf("New connection from %s\n",conn.RemoteAddr())
 
-      if err != nil{
-        fmt.Printf("\nConnection terminated.\n")
-        conn.Close()
-      }
+  for {
+    // Set a deadline for reading. Read operation will fail if no data
+    // is received after deadline.
+    conn.SetReadDeadline(time.Now().Add(timeoutDuration))
 
-      conn.Write([]byte("Connection recieved\n"))
+    // Read tokens delimited by newline
+    bytes, err := bufReader.ReadBytes('\n')
+    if err != nil {
+      fmt.Println(err)
+      return
     }
+
+    switch{
+    case string(bytes) == "close\n":
+      conn.Write([]byte("Closing connection\n"))
+      conn.Close()
+    case string(bytes) == "help\n":
+      conn.Write([]byte("Current commands:\nClose\nHelp\n"))
+    default:
+      conn.Write([]byte("Input recieved\n"))
+    }
+    // Show what the server recieved
+    fmt.Printf("%s", bytes)
+  }
 }
 
-
-
 func main() {
+  // Start listening to port 8080 for TCP connections
+  listener, err:= net.Listen("tcp", ":8080")
+  if err != nil {
+    fmt.Println(err)
+    return
+  }
 
   defer func() {
-    ln.Close()
+    listener.Close()
     fmt.Println("Listener closed")
   }()
 
-  ln, err := net.Listen("tcp", ":8080")
-  check(err, "Server Ready")
-
   for {
+    // Get net.TCPConn object
+    conn, err := listener.Accept()
+    if err != nil {
+      fmt.Println(err)
+      break
+    }
 
-    conn, err := ln.Accept()
-
-    check(err, "Connection established")
-
+    //Allow go to handle multiple connections
     go handleConnection(conn)
-  }
 
+  }
 }
