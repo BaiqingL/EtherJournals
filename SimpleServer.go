@@ -1,10 +1,12 @@
 package main
 
+// TODO: Example code only, seriously need to optimize
+
 import(
-  "net";
-  "fmt";
-  "bufio";
-  //"time";
+  "net"
+  "fmt"
+  "bufio"
+  "time"
 )
 
 
@@ -31,8 +33,6 @@ func main() {
 
     check(err, "Connection established")
 
-    dataRecieved := make(chan bool, 1)
-
     // goroutine to process data from client
     go func(){
 
@@ -42,31 +42,40 @@ func main() {
 
       // Keep connection alive
       for {
-        msg, err := buf.ReadString('\n')
 
-        fmt.Printf("Data recieved: %v", msg)
+        dataRecieved := make(chan bool, 1)
+        defer close(dataRecieved)
+
+        fmt.Println("timer started")
+        timer := time.NewTimer(3 * time.Second)
+        defer timer.Stop()
+
         go func(){
+          msg, err := buf.ReadString('\n')
+          fmt.Printf("Data recieved: %v", msg)
           dataRecieved <- true
+
+          // Mind the delim byte!
+          if string(msg) == "close\n"{
+            fmt.Printf("Connection closed by host\n")
+            conn.Write([]byte("goodbye.\n"))
+            conn.Close()
+
+          // If there is an error, terminate connection
+          if err != nil{
+            fmt.Printf("\nConnection terminated.\n")
+            conn.Close()
+          }
+
+          }
         }()
 
-        //fmt.Printf("%v\n", <- dataRecieved)
-
-        // Mind the delim byte!
-        if string(msg) == "close\n"{
-          fmt.Printf("Connection closed by host\n")
-          conn.Write([]byte("goodbye.\n"))
+        select{
+        case <- dataRecieved:
+          conn.Write([]byte("Connection recieved\n"))
+        case <- timer.C:
           conn.Close()
         }
-
-        conn.Write([]byte("Connection recieved\n"))
-
-
-        // If there is an error, terminate connection
-        if err != nil{
-          fmt.Printf("\nConnection terminated.\n")
-          break
-        }
-
       }
     }()
   }
