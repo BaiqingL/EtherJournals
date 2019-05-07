@@ -1,8 +1,5 @@
 package main
 
-// TODO: Figure out the timeout feature later
-
-
 import(
   "net";
   "fmt";
@@ -47,17 +44,19 @@ func main() {
       for {
         msg, err := buf.ReadString('\n')
 
-        // Mind the delim byte!
-        if string(msg) == "close\n"{
-          conn.Close()
-        }
-
         fmt.Printf("Data recieved: %v", msg)
         go func(){
           dataRecieved <- true
         }()
 
         //fmt.Printf("%v\n", <- dataRecieved)
+
+        // Mind the delim byte!
+        if string(msg) == "close\n"{
+          fmt.Printf("Connection closed by host\n")
+          conn.Write([]byte("goodbye.\n"))
+          conn.Close()
+        }
 
         conn.Write([]byte("Connection recieved\n"))
 
@@ -70,8 +69,5 @@ func main() {
 
       }
     }()
-
-
   }
-
 }
