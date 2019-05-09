@@ -1,6 +1,11 @@
 package main
 
 import (
+  "crypto/rand"
+  "crypto/rsa"
+  "crypto/x509"
+  "encoding/pem"
+  "os"
   "fmt"
   "net"
   "time"
@@ -49,7 +54,43 @@ func handleConnection(conn net.Conn) {
   }
 }
 
+func generatePrivKey(){
+
+  privKey, err := rsa.GenerateKey(rand.Reader, 4096)
+  if err != nil {
+      fmt.Println(err.Error)
+      os.Exit(1)
+  }
+
+  pemPrivFile, err := os.Create("privkey.pem")
+  if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+  }
+
+  var pemPrivBlock = &pem.Block{
+    Type:  "RSA PRIVATE KEY",
+    Bytes: x509.MarshalPKCS1PrivateKey(privKey),
+  }
+
+  err = pem.Encode(pemPrivFile, pemPrivBlock)
+  if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+  }
+  pemPrivFile.Close()
+}
+
+
 func main() {
+
+  if _, err := os.Stat("privkey.pem"); os.IsNotExist(err) {
+    fmt.Println("Private key not found, generating...")
+    generatePrivKey()
+  } else {
+    fmt.Println("Private key found")
+  }
+
   // Start listening to port 8080 for TCP connections
   listener, err:= net.Listen("tcp", ":8080")
   if err != nil {
