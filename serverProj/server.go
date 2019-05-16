@@ -44,15 +44,19 @@ func handleConnection(conn net.Conn) {
     case string(bytes) == "help\n":
       conn.Write([]byte("Current commands:\nClose\nHelp\n"))
     default:
-      conn.Write([]byte("Input recieved\n"))
+      // Encrypt and yeet
+      conn.Write([]byte(keys.EncryptData(bytes)))
     }
     // Show what the server recieved
     fmt.Printf("%s", bytes)
   }
 }
 
+
+
 func main() {
 
+  // Importing the keys
   if _, err := os.Stat("privkey.pem"); os.IsNotExist(err) {
     fmt.Println("Private key not found, generating...")
     keys.GeneratePrivKey()
