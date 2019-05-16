@@ -100,3 +100,7 @@ func DecryptData(ciphertext []byte) []byte{
   return plainText
 
 }
+
+func signMessage(data []byte) []byte{
+  return([]byte("Will be implemented later, working on client side for now"))
+}
