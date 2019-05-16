@@ -4,6 +4,7 @@ import (
   "crypto/rand"
   "crypto/rsa"
   "crypto/x509"
+  "crypto/sha256"
   "encoding/pem"
   "os"
   "fmt"
@@ -35,6 +36,7 @@ func GeneratePrivKey(){
       os.Exit(1)
   }
   pemPrivFile.Close()
+
 }
 
 func ImportPrivKey() (*rsa.PrivateKey){
@@ -57,4 +59,24 @@ func ImportPrivKey() (*rsa.PrivateKey){
     os.Exit(1)
   }
   return privKeyImported
+}
+
+
+func EncryptData([]byte) []byte{
+  privkey := ImportPrivKey()
+  pubkey := &privkey.PublicKey
+  message := ([]byte("testing message in byte array"))
+  label := []byte("")
+  hash := sha256.New()
+  ciphertext, err := rsa.EncryptOAEP(
+      hash, 
+      rand.Reader, 
+      pubkey, 
+      message, 
+      label)
+  if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+  }
+  return ciphertext
 }
