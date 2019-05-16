@@ -11,8 +11,9 @@ import (
   "bufio"
 )
 
-func GeneratePrivKey(){
 
+func GeneratePrivKey(){
+  // Generate key
   privKey, err := rsa.GenerateKey(rand.Reader, 4096)
   if err != nil {
       fmt.Println(err.Error)
@@ -79,4 +80,23 @@ func EncryptData([]byte) []byte{
       os.Exit(1)
   }
   return ciphertext
+}
+
+func DecryptData(ciphertext []byte) []byte{
+
+  privkey := ImportPrivKey()
+  hash := sha256.New()
+  label := []byte("")
+  plainText, err := rsa.DecryptOAEP(
+      hash, 
+      rand.Reader, 
+      privkey, 
+      ciphertext, 
+      label)
+  if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+  }
+  return plainText
+
 }
