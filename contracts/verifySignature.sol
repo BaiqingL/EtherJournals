@@ -5,9 +5,10 @@ pragma solidity ^0.6.1;
 contract verifySignature{
 
     address owner;
-
+    uint64 public verified;
     constructor() public {
-        owner = msg.sender;    
+        owner = msg.sender;
+        verified = 0;
     }
 
     function ecrecovery(
@@ -99,10 +100,14 @@ contract verifySignature{
         bytes memory sig
     ) 
         public
-        view
         returns (bool) 
     {
-        return owner == ecrecovery(hash_msg(_msg), sig);
+        if (owner == ecrecovery(hash_msg(_msg), sig)){
+            verified += 1;
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }
