@@ -21,25 +21,25 @@ contract verifySignature{
         bytes32 r;
         bytes32 s;
         uint8 v;
-        
+
         if (sig.length != 65) {
         return address(0);
     }
-    
+
     assembly {
         r := mload(add(sig, 32))
         s := mload(add(sig, 64))
         v := and(mload(add(sig, 65)), 255)
     }
-    
+
     if (uint256(s) > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {
         return address(0);
     }
-    
+
     if (v < 27) {
         v += 27;
     }
-    
+
     if (v != 27 && v != 28) {
         return address(0);
     }
@@ -81,10 +81,9 @@ contract verifySignature{
         for (j = 0; j < charCount; j++) {
             resultBytes[j] = bytesString[j];
         }
-
         return string(resultBytes);
     }
-    
+
     function hash_msg(
         string memory _msg
     ) 
@@ -94,7 +93,7 @@ contract verifySignature{
     {
         return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n", uintToString(bytes(_msg).length), _msg));
     }
-    
+
     function ecverify(
         string memory _msg,
         bytes memory sig
@@ -103,8 +102,7 @@ contract verifySignature{
         view
         returns (bool) 
     {
-        bytes32 hash = hash_msg(_msg);
-        return owner == ecrecovery(hash, sig);
+        return owner == ecrecovery(hash_msg(_msg), sig);
     }
 
 }
