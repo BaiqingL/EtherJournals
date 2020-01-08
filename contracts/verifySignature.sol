@@ -1,6 +1,7 @@
 pragma solidity ^0.6.1;
 
 // Verifies the signature using the message and the signature
+// Cryptographic functions from https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/cryptography/ECDSA.sol
 
 contract verifySignature{
 
